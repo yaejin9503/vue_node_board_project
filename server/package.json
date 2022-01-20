@@ -1,0 +1,12 @@
+{
+  "name": "fs_full_project",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.2",
+    "mssql": "^7.3.0",
+    "nodemon": "^2.0.15"
+  }
+}
