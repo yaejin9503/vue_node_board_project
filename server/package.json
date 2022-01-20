@@ -5,6 +5,7 @@
     "start": "nodemon index.js"
   },
   "dependencies": {
+    "dotenv": "^14.2.0",
     "express": "^4.17.2",
     "mssql": "^7.3.0",
     "nodemon": "^2.0.15"
