@@ -11,7 +11,7 @@ app.get("/", (req, res) =>  {
 })
 
 app.post("/create", Article.articleCreate); 
-app.get("/selectOne", Article.articleReadOne); 
+app.get("/selectOne", Article.articleReadOne)
 
 const PORT = 3000; 
 app.listen(3000, "localhost", () => { 
