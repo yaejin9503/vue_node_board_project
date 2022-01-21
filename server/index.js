@@ -1,17 +1,22 @@
 const express = require ('express')
 const { Article } = require("./api")
+const cors = require('cors')
 
-const app = express(); 
+const app = express()
 
-app.use(express.json()); 
-app.use(express.urlencoded({ extends : true })); 
+app.use(express.json())
+app.use(express.urlencoded({ extends : true }))
+app.use(cors());
 
 app.get("/", (req, res) =>  {
     res.send("Success"); 
 })
 
-app.post("/create", Article.articleCreate); 
-app.get("/selectOne", Article.articleReadOne)
+app.get("/read", Article.articleRead)
+app.get("/read/:id", Article.articleReadOne)
+app.post("/create", Article.articleCreate) 
+app.post("/delete", Article.articleDeleteOne) 
+
 
 const PORT = 3000; 
 app.listen(3000, "localhost", () => { 
