@@ -1,41 +1,54 @@
 <template>
     <li> 
-        <span v-if="this.editNum === id" class="textArea">
-            <input type="text" class="editInput" v-model="contentText"/>
-            <button class="editbtn" @click="() => editContent(id)">✅</button>
+        <span v-if="isEditing" class="textArea">
+            <input type="text"  v-model="content" class="editInput"/>
         </span> 
-        <span v-if="this.editNum !== id">{{id}} : {{content}} </span>
+        <span v-else>{{article.id}} : {{article.content}} </span>
         <span class="btnArea">
-            <button @click="() => editNumer(id)">수정</button>
-            <button @click="() => deleteContent(id)" >삭제</button>
-        </span> 
+            <button @click="() => editBtnClick()">{{ !isEditing ? "수정" : "수정취소"}}</button>
+            <button @click="() => !isEditing ? deleteElem(article.id) : editContent()" >{{!isEditing ? "삭제" : "수정완료" }}</button>
+        </span>     
     </li>
 </template>
 <script>
 //import axios from "axios"; 
+import axios from "axios"; 
 
 export default {
     name: 'Card',
+    props: {
+        article: { 
+            default: {
+                content: null, 
+                id: null, 
+            }
+        } 
+    }, 
     data(){ 
-        return {
-            contentText: ''
+        return{ 
+            content: '', 
+            isEditing: false
         }
     }, 
-    props: { 
-        id: Number, 
-        content: String,
-        editNum: Number
-    }, 
     methods: { 
-        async deleteContent(id){ 
-            this.$emit('deleteContent', id); 
-        }, 
-        editNumer(id){ 
-            this.$emit('editNumer',id)
+
+        editBtnClick(){ 
+            this.content = this.article.content
+            this.isEditing = !this.isEditing; 
         },
-        editContent(id){ 
-            alert(id, this.contentText)
-            //this.$emit('editContentText', id, contentText); 
+        async deleteElem(id){ 
+            await axios.post('http://localhost:3000/delete',{ 
+                id : id
+            })
+            this.$emit('delete', id);
+        },
+        async editContent(){ 
+            await axios.post('http://localhost:3000/update',{ 
+                id : this.article.id, 
+                content: this.content 
+            })
+            this.isEditing = !this.isEditing 
+            this.$emit('update', { id: this.article.id, content: this.content }); 
         }
     }
 }

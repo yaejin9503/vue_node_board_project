@@ -11,14 +11,15 @@
             </li> -->
             <Card 
                 v-for="(item, index) in articles" 
-                :id ="item.id" 
-                :content="item.content" 
+                :article ="item" 
                 :key="index"
-                @deleteContent="deleteContent" 
-                @editNumer="editNumer"
-                :editNum="editNum"
+                @update="updateContent"
+                @delete="deleteContent"
             />
         </ul>
+        <div v-if="isShowMoreBtn">
+            <button @click="morebtn">더보기</button>
+        </div>
     </div>
 </template>
 <script>
@@ -32,18 +33,25 @@ export default {
           content: '',
           page_num: 1,
           page_size: 10,
-          editNum: 0
+          editNum: 0,
+          editContent: '',
+          dataLength: 0,
+          isShowMoreBtn: true 
       }
   },
   created(){ 
-    this.getArticle(); 
+    this.init(); 
   }, 
   components : { 
       Card
   },
   methods:{ 
-    async getArticle(){
-      const { data }  = await axios.get('http://localhost:3000/read', { 
+    async init(){
+      this.articles = await this.getArticles();
+      this.isShowMoreBtn = this.dataLength <= this.articles.length ? false : true; 
+    }, 
+    async getArticles(){ 
+        const { data } = await axios.get('http://localhost:3000/read', { 
           params: { 
               pageNum : this.page_num, 
               pageSize: this.page_size
@@ -52,8 +60,10 @@ export default {
       .catch((e) => { 
           console.log(e) 
       });
-      this.articles = data
-    }, 
+      this.dataLength = data[1][0].totalCount; 
+      this.isShowMoreBtn = this.dataLength <= this.articles ? false : true; 
+      return data[0]; 
+    },
     goContent(articleId){ 
         this.$router.push({ name: 'article', params: {id : articleId}})
     }, 
@@ -63,28 +73,27 @@ export default {
         })
         // console.log(result); 
         if(result.status === 200){ 
-            this.getArticle() 
-            /**조회 DB에 offset를 추가해야 할 것 같음 */
+            this.page_num = this.page_num !== 1 ? 1 : this.page_num
+            this.init(); 
         }else{  
             alert('서버와의 통신이 이뤄지지 않았습니다.')
         }
         
     },
-    async deleteContent(id){
-        const result = await axios.post('http://localhost:3000/delete',{ 
-                id : id
-        })
-        if(result.status === 200){ 
-            alert('delete ok!'); 
-            this.getArticle() 
-        }else{ 
-            alert('삭제 실패'); 
-        }
-       // console.log(result); 
-       
-    }, 
-    editNumer(id){ 
-        this.editNum = id 
+    deleteContent(id){ 
+        const idx = this.articles.findIndex(item => item.id === id); 
+        this.articles.splice(idx, 1);
+    },
+    updateContent({id, content}){
+        const idx = this.articles.findIndex(item => item.id === id); 
+        this.articles[idx].content = content
+    },
+    async morebtn(){ 
+        this.page_num = this.page_num + 1
+        const data = await this.getArticles(); 
+        // 불필요한 데이터 렌더링 축소
+        this.articles = this.articles.concat(data);
+        this.isShowMoreBtn = this.dataLength <= this.articles.length ? false : true; 
     }
   }
 }
@@ -92,7 +101,7 @@ export default {
 <style scoped>
     ul{ 
         width: 100%;
-        max-width: 360px;
+        max-width: 390px;
         justify-content: center;
         margin: 0px auto;
         margin-top: 30px;

@@ -57,10 +57,27 @@ const deleteOneArticle = async function(id){
     }
 }
 
+const updateOneArticle =async function(id, content){ 
+    const connectionPool = await pool; 
+
+    const request = await connectionPool.request() 
+    const input = await request.input('id', sql.Int, id)
+                               .input('content', sql.NVarChar, content) 
+
+    try{ 
+        const query = await input.execute('Update_One_Article')
+        return query; 
+    }
+    catch(err){ 
+        return err; 
+    }
+}
+
 
 module.exports = {
     insertArticle,
     deleteOneArticle,
     selectAllArticle,
-    selectOneArticle
+    selectOneArticle,
+    updateOneArticle
 }

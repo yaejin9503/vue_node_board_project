@@ -16,6 +16,7 @@ app.get("/read", Article.articleRead)
 app.get("/read/:id", Article.articleReadOne)
 app.post("/create", Article.articleCreate) 
 app.post("/delete", Article.articleDeleteOne) 
+app.post("/update", Article.articleUpdateOne)
 
 
 const PORT = 3000; 

@@ -21,7 +21,8 @@ const articleRead = async (req, res) => {
     }catch(e){ 
         console.error(e); 
     }
-    res.send(result.recordsets ? result.recordsets[0] : [] );
+    console.log(result.recordsets);
+    res.send(result.recordsets ? result.recordsets : [] );
 }
 
 // ONE CONTENT READ 
@@ -52,10 +53,23 @@ const articleDeleteOne = async (req, res) => {
     }
     res.send(result)
 }
+
+const articleUpdateOne = async (req, res) => { 
+    const { id, content } = req.body
+    let result; 
+    try{ 
+        result = await query.updateOneArticle(id, content)
+    }catch(e){ 
+        console.error(e); 
+    }
+    res.send(result)
+}
+
 module.exports = {
     articleCreate,
     articleRead,
     articleReadOne, 
     articleUpdate,
-    articleDeleteOne
+    articleDeleteOne,
+    articleUpdateOne
 }
